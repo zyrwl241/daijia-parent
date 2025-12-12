@@ -52,6 +52,8 @@ public class GuiguLoginAspect {
 
         //6 执行业务方法
         return proceedingJoinPoint.proceed();
+
+        //test of GitHub commit
     }
 
 }
