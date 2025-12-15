@@ -20,10 +20,12 @@ public class CosController {
     @Autowired
     private CosService cosService;
 
+    //文件上传接口
     @Operation(summary = "上传")
+    //@GuiguLogin
     @PostMapping("/upload")
     public Result<CosUploadVo> upload(@RequestPart("file") MultipartFile file,
-                                      @RequestParam("path") String path) {
+                                      @RequestParam(name = "path",defaultValue = "auth") String path) {
         CosUploadVo cosUploadVo = cosService.upload(file,path);
         return Result.ok(cosUploadVo);
     }
