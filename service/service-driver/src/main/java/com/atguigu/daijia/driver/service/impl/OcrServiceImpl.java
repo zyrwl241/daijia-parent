@@ -140,18 +140,18 @@ public class OcrServiceImpl implements OcrService {
                 driverLicenseOcrVo.setDriverLicenseClazz(resp.getClass_());
                 //驾驶证证件号
                 driverLicenseOcrVo.setDriverLicenseNo(resp.getCardCode());
-                //驾驶证有效期
-                driverLicenseOcrVo.setDriverLicenseIssueDate(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(resp.getDateOfFirstIssue()).toDate());
                 //驾驶证初次领证日期
+                driverLicenseOcrVo.setDriverLicenseIssueDate(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(resp.getDateOfFirstIssue()).toDate());
+                //驾驶证有效期
                 driverLicenseOcrVo.setDriverLicenseExpire(DateTimeFormat.forPattern("yyyy-MM-dd").parseDateTime(resp.getEndDate()).toDate());
 
-                //上传驾驶证反面图片到腾讯云cos
+                //上传驾驶证图片到腾讯云cos
                 CosUploadVo cosUploadVo = cosService.upload(file, "driverLicense");
                 driverLicenseOcrVo.setDriverLicenseFrontUrl(cosUploadVo.getUrl());
                 driverLicenseOcrVo.setDriverLicenseFrontShowUrl(cosUploadVo.getShowUrl());
             } else {
-                //驾驶证反面
-                //上传驾驶证反面图片到腾讯云cos
+                //驾驶证副页
+                //上传驾驶证副页图片到腾讯云cos
                 CosUploadVo cosUploadVo =  cosService.upload(file, "driverLicense");
                 driverLicenseOcrVo.setDriverLicenseBackUrl(cosUploadVo.getUrl());
                 driverLicenseOcrVo.setDriverLicenseBackShowUrl(cosUploadVo.getShowUrl());
