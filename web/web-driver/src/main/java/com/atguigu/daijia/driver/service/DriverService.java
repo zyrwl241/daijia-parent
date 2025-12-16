@@ -1,5 +1,6 @@
 package com.atguigu.daijia.driver.service;
 
+import com.atguigu.daijia.model.form.driver.DriverFaceModelForm;
 import com.atguigu.daijia.model.form.driver.UpdateDriverAuthInfoForm;
 import com.atguigu.daijia.model.vo.driver.DriverAuthInfoVo;
 
@@ -11,4 +12,6 @@ public interface DriverService {
     DriverAuthInfoVo getDriverAuthInfo(Long driverId);
 
     Boolean updateDriverAuthInfo(UpdateDriverAuthInfoForm updateDriverAuthInfoForm);
+
+    Boolean creatDriverFaceModel(DriverFaceModelForm driverFaceModelForm);
 }
