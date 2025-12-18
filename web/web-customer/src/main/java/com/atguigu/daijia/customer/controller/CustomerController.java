@@ -8,6 +8,8 @@ import com.atguigu.daijia.common.result.ResultCodeEnum;
 import com.atguigu.daijia.common.util.AuthContextHolder;
 import com.atguigu.daijia.customer.client.CustomerInfoFeignClient;
 import com.atguigu.daijia.customer.service.CustomerService;
+import com.atguigu.daijia.customer.service.OrderService;
+import com.atguigu.daijia.model.form.customer.SubmitOrderForm;
 import com.atguigu.daijia.model.vo.customer.CustomerLoginVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,9 +31,7 @@ public class CustomerController {
     @Autowired
     private CustomerService customerInfoService;
     @Autowired
-    private RedisTemplate redisTemplate;
-    @Autowired
-    private CustomerInfoFeignClient customerInfoFeignClient;
+    private OrderService orderService;
 
     //微信小程序登录接口
     @Operation(summary = "小程序授权登录")
@@ -54,6 +54,21 @@ public class CustomerController {
         log.info("获取用户基本信息：{}", customerLoginVo);
         //2.返回用户信息
         return Result.ok(customerLoginVo);
+    }
+
+    @Operation(summary = "乘客下单")
+    @GuiguLogin
+    @PostMapping("/submitOrder")
+    public Result<Long> submitOrder(@RequestBody SubmitOrderForm submitOrderForm) {
+        submitOrderForm.setCustomerId(AuthContextHolder.getUserId());
+        return Result.ok(orderService.submitOrder(submitOrderForm));
+    }
+
+    @Operation(summary = "查询订单状态")
+    @GuiguLogin
+    @GetMapping("/getOrderStatus/{orderId}")
+    public Result<Integer> getOrderStatus(@PathVariable Long orderId) {
+        return Result.ok(orderService.getOrderStatus(orderId));
     }
 
 }
