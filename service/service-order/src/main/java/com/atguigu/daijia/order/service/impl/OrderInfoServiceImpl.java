@@ -61,6 +61,11 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         return orderInfo.getStatus();
     }
 
+    @Override
+    public void orderCancel(long l) {
+
+    }
+
     public void log(Long orderId, Integer status) {
         //声明OrderStatusLog类对象，用于记录订单状态和操作时间
         OrderStatusLog orderStatusLog = new OrderStatusLog();

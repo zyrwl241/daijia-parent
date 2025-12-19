@@ -115,8 +115,7 @@ public class LocationServiceImpl implements LocationService {
                         new BigDecimal(item.getDistance().getValue()).setScale(2, RoundingMode.HALF_UP);
 
                 BigDecimal acceptDistance = driverSet.getAcceptDistance();
-                if(acceptDistance.doubleValue() !=0
-                        && acceptDistance.subtract(currentDistance).doubleValue()<0) {
+                if(acceptDistance.doubleValue() !=0 && acceptDistance.subtract(currentDistance).doubleValue()<0) {
                     continue;
                 }
 

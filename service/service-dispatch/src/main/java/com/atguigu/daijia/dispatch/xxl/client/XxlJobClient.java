@@ -111,6 +111,7 @@ public class XxlJobClient {
         throw new GuiguException(ResultCodeEnum.DATA_ERROR);
     }
 
+    //添加并启动任务
     public Long addAndStart(String executorHandler, String param, String corn, String desc) {
         XxlJobInfo xxlJobInfo = new XxlJobInfo();
         xxlJobInfo.setJobGroup(xxlJobClientConfig.getJobGroupId());

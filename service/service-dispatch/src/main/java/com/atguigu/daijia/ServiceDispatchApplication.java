@@ -18,6 +18,7 @@ public class ServiceDispatchApplication {
 
     @Bean
     public RestTemplate restTemplate() {
+
         return new RestTemplate();
     }
 }
