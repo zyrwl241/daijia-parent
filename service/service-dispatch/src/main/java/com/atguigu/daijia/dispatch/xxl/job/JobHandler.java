@@ -38,8 +38,7 @@ public class JobHandler {
             e.printStackTrace();
         } finally {
             long times = System.currentTimeMillis()- startTime;
-            //TODO 完善long
-            xxlJobLog.setTimes((int)times);
+            xxlJobLog.setTimes(times);
             xxlJobLogMapper.insert(xxlJobLog);
         }
     }

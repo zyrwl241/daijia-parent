@@ -13,5 +13,5 @@ public interface NewOrderService {
 
     List<NewOrderDataVo> findNewOrderQueueData(Long driverId);
 
-    Boolean clearNewOrderQueueData(Long driverId);
+    Boolean clearNewOrderQueueData(java.lang.Long driverId);
 }
