@@ -56,20 +56,7 @@ public class CustomerController {
         return Result.ok(customerLoginVo);
     }
 
-    @Operation(summary = "乘客下单")
-    @GuiguLogin
-    @PostMapping("/submitOrder")
-    public Result<Long> submitOrder(@RequestBody SubmitOrderForm submitOrderForm) {
-        submitOrderForm.setCustomerId(AuthContextHolder.getUserId());
-        return Result.ok(orderService.submitOrder(submitOrderForm));
-    }
 
-    @Operation(summary = "查询订单状态")
-    @GuiguLogin
-    @GetMapping("/getOrderStatus/{orderId}")
-    public Result<Integer> getOrderStatus(@PathVariable Long orderId) {
-        return Result.ok(orderService.getOrderStatus(orderId));
-    }
 
 }
 

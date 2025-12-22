@@ -62,7 +62,7 @@ public class OrderServiceImpl implements OrderService {
     public Long submitOrder(SubmitOrderForm submitOrderForm) {
         //1 重新计算驾驶线路
         CalculateDrivingLineForm calculateDrivingLineForm = new CalculateDrivingLineForm();
-        BeanUtils.copyProperties(submitOrderForm,submitOrderForm);
+        BeanUtils.copyProperties(submitOrderForm,calculateDrivingLineForm);
         Result<DrivingLineVo> drivingLineVoResult = mapFeignClient.calculateDrivingLine(calculateDrivingLineForm);
         DrivingLineVo drivingLineVo = drivingLineVoResult.getData();
 
