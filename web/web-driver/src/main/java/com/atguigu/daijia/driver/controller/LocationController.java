@@ -25,7 +25,7 @@ public class LocationController {
     private LocationService locationService;
 
     @Operation(summary = "开启接单服务：更新司机经纬度位置")
-    //@GuiguLogin
+    @GuiguLogin
     @PostMapping("/updateDriverLocation")
     public Result<Boolean> updateDriverLocation(@RequestBody UpdateDriverLocationForm updateDriverLocationForm) {
         Long driverId = AuthContextHolder.getUserId();//司机id

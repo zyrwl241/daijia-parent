@@ -1,5 +1,6 @@
 package com.atguigu.daijia.order.service.impl;
 
+import com.atguigu.daijia.common.constant.RedisConstant;
 import com.atguigu.daijia.model.entity.order.OrderInfo;
 import com.atguigu.daijia.model.entity.order.OrderStatusLog;
 import com.atguigu.daijia.model.enums.OrderStatus;
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -24,6 +26,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     private OrderInfoMapper orderInfoMapper;
     @Autowired
     private OrderStatusLogMapper orderStatusLogMapper;
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //乘客下单
     @Override
@@ -61,9 +65,21 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         return orderInfo.getStatus();
     }
 
+    //调用方法取消订单
     @Override
-    public void orderCancel(long l) {
-
+    public void orderCancel(long orderId) {
+        //orderId查询订单信息
+        OrderInfo orderInfo = orderInfoMapper.selectById(orderId);
+        //判断
+        if(orderInfo.getStatus().equals(OrderStatus.WAITING_ACCEPT.getStatus())) {
+            //修改订单状态：取消状态
+            orderInfo.setStatus(OrderStatus.CANCEL_ORDER.getStatus());
+            int rows = orderInfoMapper.updateById(orderInfo);
+            if(rows == 1) {
+                //删除接单标识
+                redisTemplate.delete(RedisConstant.ORDER_ACCEPT_MARK);
+            }
+        }
     }
 
     public void log(Long orderId, Integer status) {

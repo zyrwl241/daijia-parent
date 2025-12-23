@@ -44,7 +44,6 @@ public class DriverInfoController {
         return Result.ok(driverAuthInfoVo);
     }
 
-    //更新司机认证信息
     @Operation(summary = "更新司机认证信息")
     @PostMapping("/updateDriverAuthInfo")
     public Result<Boolean> updateDriverAuthInfo(@RequestBody UpdateDriverAuthInfoForm updateDriverAuthInfoForm) {
@@ -52,7 +51,6 @@ public class DriverInfoController {
         return Result.ok(isSuccess);
     }
 
-    //创建司机人脸模型
     @Operation(summary = "创建司机人脸模型")
     @PostMapping("/creatDriverFaceModel")
     public Result<Boolean> creatDriverFaceModel(@RequestBody DriverFaceModelForm driverFaceModelForm) {

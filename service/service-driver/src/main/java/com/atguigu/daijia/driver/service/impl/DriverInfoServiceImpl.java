@@ -139,8 +139,10 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
         DriverInfo driverInfo = driverInfoMapper.selectById(driverId);
         //声明DriverAuthInfoVo对象，用来存放司机认证信息
         DriverAuthInfoVo driverAuthInfoVo = new DriverAuthInfoVo();
-        //将DriverInfo对象的属性值复制给DriverAuthInfo对象
+        //将DriverInfo对象的属性值复制给DriverAuthInfoVo对象
         BeanUtils.copyProperties(driverInfo,driverAuthInfoVo);
+        driverAuthInfoVo.setDriverId(driverId);
+
         //身份证照路径
         driverAuthInfoVo.setIdcardBackShowUrl(cosService.getImageUrl(driverAuthInfoVo.getIdcardBackUrl()));
         driverAuthInfoVo.setIdcardFrontShowUrl(cosService.getImageUrl(driverAuthInfoVo.getIdcardFrontUrl()));
@@ -163,8 +165,10 @@ public class DriverInfoServiceImpl extends ServiceImpl<DriverInfoMapper, DriverI
         DriverInfo driverInfo = new DriverInfo();
         driverInfo.setId(driverId);
         BeanUtils.copyProperties(updateDriverAuthInfoForm,driverInfo);
+        driverInfo.setAuthStatus(2);
         //返回更新结果是否成功
         boolean update = this.updateById(driverInfo);
+        log.info("-----------------------updateDriverAuthInfoForm:{}",update);
         return update;
     }
 

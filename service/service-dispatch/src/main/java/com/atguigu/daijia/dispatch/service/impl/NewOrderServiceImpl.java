@@ -43,13 +43,14 @@ public class NewOrderServiceImpl implements NewOrderService {
     //执行任务：搜索附件的代驾司机
     @Override
     public void executeTask(long jobId) {
-        //1 根据jobid查询数据库，当前任务是否已经创建
+        //1 根据jobId查询数据库，当前任务是否已经创建
         //如果没有创建，不往下执行了
         LambdaQueryWrapper<OrderJob> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(OrderJob::getJobId,jobId);
         OrderJob orderJob = orderJobMapper.selectOne(wrapper);
         if(orderJob == null) {
             //不往下执行了
+            log.error("------------executeTask orderJob is null--------");
             return;
         }
 
