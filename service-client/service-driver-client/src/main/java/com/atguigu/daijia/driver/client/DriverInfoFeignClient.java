@@ -21,13 +21,13 @@ public interface DriverInfoFeignClient {
     Result<Long> login(@PathVariable("code") String code);
     //获取司机信息
     @GetMapping("/driver/info/getDriverLoginInfo/{driverId}")
-    public Result<DriverLoginVo> getDriverInfo(@PathVariable Long driverId);
+    Result<DriverLoginVo> getDriverInfo(@PathVariable("driverId") Long driverId);
     //获取司机认证信息
     @GetMapping("/driver/info/getDriverAuthInfo/{driverId}")
-    public Result<DriverAuthInfoVo> getDriverAuthInfo(@PathVariable Long driverId);
+    Result<DriverAuthInfoVo> getDriverAuthInfo(@PathVariable("driverId") Long driverId);
     //更新司机认证信息
     @PostMapping("/driver/info/updateDriverAuthInfo")
-    Result<Boolean> UpdateDriverAuthInfo(@RequestBody UpdateDriverAuthInfoForm updateDriverAuthInfoForm);
+    Result<Boolean> updateDriverAuthInfo(@RequestBody UpdateDriverAuthInfoForm updateDriverAuthInfoForm);
     //创建司机人脸识别模型
     @PostMapping("/driver/info/creatDriverFaceModel")
     Result<Boolean> creatDriverFaceModel(@RequestBody DriverFaceModelForm driverFaceModelForm);

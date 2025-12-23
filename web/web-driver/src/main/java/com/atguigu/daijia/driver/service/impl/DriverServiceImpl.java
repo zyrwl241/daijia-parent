@@ -43,7 +43,7 @@ public class DriverServiceImpl implements DriverService {
     public String login(String code) {
         //远程调用，得到司机id
         Result<Long> longResult = driverInfoFeignClient.login(code);
-        //TODO 判断
+        // 判断
         Long driverId = longResult.getData();
 
         //token字符串
@@ -67,7 +67,7 @@ public class DriverServiceImpl implements DriverService {
     //修改司机认证信息
     @Override
     public Boolean updateDriverAuthInfo(UpdateDriverAuthInfoForm updateDriverAuthInfoForm) {
-        Result<Boolean> booleanResult = driverInfoFeignClient.UpdateDriverAuthInfo(updateDriverAuthInfoForm);
+        Result<Boolean> booleanResult = driverInfoFeignClient.updateDriverAuthInfo(updateDriverAuthInfoForm);
         Boolean data = booleanResult.getData();
         return data;
     }
@@ -92,9 +92,10 @@ public class DriverServiceImpl implements DriverService {
     //开始接单服务
     @Override
     public Boolean startService(Long driverId) {
-        //1 判断完成认证
+        //1 判断是否完成认证
         DriverLoginVo driverLoginVo = driverInfoFeignClient.getDriverInfo(driverId).getData();
         if(driverLoginVo.getAuthStatus()!=2) {
+            log.error("司机{}未完成实名认证，认证状态：{}", driverId, driverLoginVo.getAuthStatus());
             throw new GuiguException(ResultCodeEnum.AUTH_ERROR);
         }
 
