@@ -24,6 +24,7 @@ import com.tencentcloudapi.common.profile.ClientProfile;
 import com.tencentcloudapi.common.profile.HttpProfile;
 import com.tencentcloudapi.iai.v20180301.IaiClient;
 import com.tencentcloudapi.iai.v20180301.models.*;
+import jakarta.security.auth.message.AuthStatus;
 import lombok.extern.slf4j.Slf4j;
 import me.chanjar.weixin.common.error.WxErrorException;
 import org.joda.time.DateTime;

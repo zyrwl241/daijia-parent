@@ -1,6 +1,8 @@
 package com.atguigu.daijia.order.service.impl;
 
 import com.atguigu.daijia.common.constant.RedisConstant;
+import com.atguigu.daijia.common.execption.GuiguException;
+import com.atguigu.daijia.common.result.ResultCodeEnum;
 import com.atguigu.daijia.model.entity.order.OrderInfo;
 import com.atguigu.daijia.model.entity.order.OrderStatusLog;
 import com.atguigu.daijia.model.enums.OrderStatus;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -44,6 +47,11 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
         //记录日志
         this.log(orderInfo.getId(),orderInfo.getStatus());
+
+        //向redis添加标识
+        //接单标识，标识不存在了说明不在等待接单状态了
+        redisTemplate.opsForValue().set(RedisConstant.ORDER_ACCEPT_MARK,
+                "0", RedisConstant.ORDER_ACCEPT_MARK_EXPIRES_TIME, TimeUnit.MINUTES);
 
         return orderInfo.getId();
     }
@@ -80,6 +88,37 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
                 redisTemplate.delete(RedisConstant.ORDER_ACCEPT_MARK);
             }
         }
+    }
+
+    //司机抢单
+    @Override
+    public Boolean robNewOrder(Long driverId, Long orderId) {
+        //判断订单是否存在，通过Redis，减少数据库压力
+        if(Boolean.FALSE.equals(redisTemplate.hasKey(RedisConstant.ORDER_ACCEPT_MARK))) {
+            //抢单失败
+            throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
+        }
+
+        //司机抢单
+        //修改order_info表订单状态值2：已经接单 + 司机id + 司机接单时间
+        //修改条件：根据订单id
+        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OrderInfo::getId,orderId);
+        OrderInfo orderInfo = orderInfoMapper.selectOne(wrapper);
+        //设置
+        orderInfo.setStatus(OrderStatus.ACCEPTED.getStatus());
+        orderInfo.setDriverId(driverId);
+        orderInfo.setAcceptTime(new Date());
+        //调用方法修改
+        int rows = orderInfoMapper.updateById(orderInfo);
+        if(rows != 1) {
+            //抢单失败
+            throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
+        }
+
+        //删除抢单标识
+        redisTemplate.delete(RedisConstant.ORDER_ACCEPT_MARK);
+        return true;
     }
 
     public void log(Long orderId, Integer status) {
