@@ -43,5 +43,7 @@ public interface DriverInfoFeignClient {
     //更新接单状态
     @GetMapping("/driver/info/updateServiceStatus/{driverId}/{status}")
     Result<Boolean> updateServiceStatus(@PathVariable("driverId") Long driverId, @PathVariable("status") Integer status);
-
+    //获取司机信息在接单时
+    @GetMapping("/driver/info/getDriverInfo/{driverId}")
+    Result<DriverInfoVo> getDriverInfoOrder(@PathVariable("driverId") Long driverId);
 }

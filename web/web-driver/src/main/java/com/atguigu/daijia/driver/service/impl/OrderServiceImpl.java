@@ -3,8 +3,14 @@ package com.atguigu.daijia.driver.service.impl;
 import com.atguigu.daijia.common.execption.GuiguException;
 import com.atguigu.daijia.common.result.ResultCodeEnum;
 import com.atguigu.daijia.dispatch.client.NewOrderFeignClient;
+import com.atguigu.daijia.driver.client.DriverInfoFeignClient;
 import com.atguigu.daijia.driver.service.OrderService;
+import com.atguigu.daijia.map.client.MapFeignClient;
 import com.atguigu.daijia.model.entity.order.OrderInfo;
+import com.atguigu.daijia.model.form.map.CalculateDrivingLineForm;
+import com.atguigu.daijia.model.form.order.UpdateOrderCartForm;
+import com.atguigu.daijia.model.vo.driver.DriverInfoVo;
+import com.atguigu.daijia.model.vo.map.DrivingLineVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import com.atguigu.daijia.model.vo.order.NewOrderDataVo;
 import com.atguigu.daijia.model.vo.order.OrderInfoVo;
@@ -25,6 +31,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderInfoFeignClient orderInfoFeignClient;
     @Autowired
     private NewOrderFeignClient newOrderFeignClient;
+    @Autowired
+    private DriverInfoFeignClient driverInfoFeignClient;
 
     //根据订单id获取订单状态
     @Override
@@ -61,4 +69,28 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(orderInfo,orderInfoVo);
         return orderInfoVo;
     }
+
+    //根据订单id获取司机信息
+    @Override
+    public DriverInfoVo getDriverInfoOrder(Long orderId, Long customerId) {
+        //根据订单id获取订单信息
+        OrderInfo orderInfo = orderInfoFeignClient.getOrderInfo(orderId).getData();
+        if(!orderInfo.getCustomerId().equals(customerId)) {
+            throw new GuiguException(ResultCodeEnum.DATA_ERROR);
+        }
+        return driverInfoFeignClient.getDriverInfoOrder(orderInfo.getDriverId()).getData();
+    }
+
+    //司机到达代驾起始地点
+    @Override
+    public Boolean driverArriverStartLocation(Long orderId, Long driverId) {
+        return orderInfoFeignClient.driverArriveStartLocation(orderId, driverId).getData();
+    }
+
+    //更新代驾车辆信息
+    @Override
+    public Boolean updateOrderCart(UpdateOrderCartForm updateOrderCartForm) {
+        return orderInfoFeignClient.updateOrderCart(updateOrderCartForm).getData();
+    }
+
 }

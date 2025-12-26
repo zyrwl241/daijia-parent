@@ -6,6 +6,10 @@ import com.atguigu.daijia.common.util.AuthContextHolder;
 import com.atguigu.daijia.driver.service.DriverService;
 import com.atguigu.daijia.driver.service.OrderService;
 import com.atguigu.daijia.model.form.driver.DriverFaceModelForm;
+import com.atguigu.daijia.model.form.map.CalculateDrivingLineForm;
+import com.atguigu.daijia.model.form.order.UpdateOrderCartForm;
+import com.atguigu.daijia.model.vo.driver.DriverInfoVo;
+import com.atguigu.daijia.model.vo.map.DrivingLineVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import com.atguigu.daijia.model.vo.order.NewOrderDataVo;
 import com.atguigu.daijia.model.vo.order.OrderInfoVo;
@@ -66,6 +70,31 @@ public class OrderController {
     public Result<OrderInfoVo> getOrderInfo(@PathVariable Long orderId) {
         Long driverId = AuthContextHolder.getUserId();
         return Result.ok(orderService.getOrderInfo(orderId, driverId));
+    }
+
+    @Operation(summary = "根据订单id获取司机基本信息")
+    @GuiguLogin
+    @GetMapping("/getDriverInfo/{orderId}")
+    public Result<DriverInfoVo> getDriverInfo(@PathVariable Long orderId) {
+        Long customerId = AuthContextHolder.getUserId();
+        return Result.ok(orderService.getDriverInfoOrder(orderId, customerId));
+    }
+
+    @Operation(summary = "司机到达代驾起始地点")
+    @GuiguLogin
+    @GetMapping("/driverArriveStartLocation/{orderId}")
+    public Result<Boolean> driverArriverStartLocation(@PathVariable Long orderId) {
+        Long driverId = AuthContextHolder.getUserId();
+        return Result.ok(orderService.driverArriverStartLocation(orderId, driverId));
+    }
+
+    @Operation(summary = "更新代驾车辆信息")
+    @GuiguLogin
+    @PostMapping("/updateOrderCart")
+    public Result<Boolean> updateOrderCart(@RequestBody UpdateOrderCartForm updateOrderCartForm) {
+        Long driverId = AuthContextHolder.getUserId();
+        updateOrderCartForm.setDriverId(driverId);
+        return Result.ok(orderService.updateOrderCart(updateOrderCartForm));
     }
 }
 

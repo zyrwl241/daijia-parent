@@ -140,6 +140,12 @@ public class OrderServiceImpl implements OrderService {
         return orderInfoVo;
     }
 
+    //计算最佳驾驶路线
+    @Override
+    public DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm) {
+        return mapFeignClient.calculateDrivingLine(calculateDrivingLineForm).getData();
+    }
+
     //获取订单状态
     @Override
     public Integer getOrderStatus(Long orderId) {

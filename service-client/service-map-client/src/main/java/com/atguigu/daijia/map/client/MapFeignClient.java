@@ -2,6 +2,7 @@ package com.atguigu.daijia.map.client;
 
 import com.atguigu.daijia.common.result.Result;
 import com.atguigu.daijia.model.form.map.CalculateDrivingLineForm;
+import com.atguigu.daijia.model.form.map.UpdateOrderLocationForm;
 import com.atguigu.daijia.model.vo.map.DrivingLineVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,4 +16,7 @@ public interface MapFeignClient {
     public Result<DrivingLineVo> calculateDrivingLine(@RequestBody CalculateDrivingLineForm
                                                               calculateDrivingLineForm);
 
+    //司机赶往代驾起始点：更新订单地址到缓存
+    @PostMapping("/map/location/updateOrderLocationToCache")
+    Result<Boolean> updateOrderLocationToCache(@RequestBody UpdateOrderLocationForm updateOrderLocationForm);
 }
