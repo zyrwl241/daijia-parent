@@ -49,7 +49,8 @@ public class OrderServiceImpl implements OrderService {
     //司机抢单
     @Override
     public Boolean robNewOrder(Long driverId, Long orderId) {
-        return orderInfoFeignClient.robNewOrder(driverId, orderId).getData();
+        Boolean flag = orderInfoFeignClient.robNewOrder(driverId, orderId).getData();
+        return flag;
     }
 
     //司机端查找当前订单

@@ -14,6 +14,7 @@ import com.atguigu.daijia.order.mapper.OrderStatusLogMapper;
 import com.atguigu.daijia.order.service.OrderInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
@@ -100,7 +101,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     @Override
     public Boolean robNewOrder(Long driverId, Long orderId) {
         //判断订单是否存在，通过Redis，减少数据库压力
-        if(Boolean.FALSE.equals(redisTemplate.hasKey(RedisConstant.ORDER_ACCEPT_MARK))) {
+        if(!redisTemplate.hasKey(RedisConstant.ORDER_ACCEPT_MARK)) {
             //抢单失败
             throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
         }
@@ -119,11 +120,14 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
                 wrapper.eq(OrderInfo::getStatus,OrderStatus.WAITING_ACCEPT.getStatus());
 
                 OrderInfo orderInfo = new OrderInfo();
+                orderInfo.setId(orderId);
                 orderInfo.setStatus(OrderStatus.ACCEPTED.getStatus());
                 orderInfo.setDriverId(driverId);
                 orderInfo.setAcceptTime(new Date());
+
                 //调用方法修改
                 int rows = orderInfoMapper.updateById(orderInfo);
+
                 if(rows != 1) {
                     //抢单失败
                     throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
@@ -134,7 +138,7 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             }
 
         }catch (Exception e) {
-            log.error("robNewOrder error:{}", e);
+            log.error("------------------robNewOrder error----", e);
             throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
         }finally {
             //如果锁还在（没有过期）
