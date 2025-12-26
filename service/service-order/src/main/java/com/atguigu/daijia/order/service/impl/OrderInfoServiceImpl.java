@@ -7,11 +7,14 @@ import com.atguigu.daijia.model.entity.order.OrderInfo;
 import com.atguigu.daijia.model.entity.order.OrderStatusLog;
 import com.atguigu.daijia.model.enums.OrderStatus;
 import com.atguigu.daijia.model.form.order.OrderInfoForm;
+import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import com.atguigu.daijia.order.mapper.OrderInfoMapper;
 import com.atguigu.daijia.order.mapper.OrderStatusLogMapper;
 import com.atguigu.daijia.order.service.OrderInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,6 +34,8 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
     private OrderStatusLogMapper orderStatusLogMapper;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private RedissonClient redissonClient;
 
     //乘客下单
     @Override
@@ -98,27 +103,115 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             //抢单失败
             throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
         }
+        //创建锁
+        RLock lock = redissonClient.getLock(RedisConstant.ROB_NEW_ORDER_LOCK + orderId);
+        try {
+            //获取锁
+            Boolean flag = lock.tryLock(RedisConstant.ROB_NEW_ORDER_LOCK_WAIT_TIME, RedisConstant.ROB_NEW_ORDER_LOCK_LEASE_TIME, TimeUnit.SECONDS);
+            //获取锁成功
+            if(flag) {
 
-        //司机抢单
-        //修改order_info表订单状态值2：已经接单 + 司机id + 司机接单时间
-        //修改条件：根据订单id
-        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(OrderInfo::getId,orderId);
-        OrderInfo orderInfo = orderInfoMapper.selectOne(wrapper);
-        //设置
-        orderInfo.setStatus(OrderStatus.ACCEPTED.getStatus());
-        orderInfo.setDriverId(driverId);
-        orderInfo.setAcceptTime(new Date());
-        //调用方法修改
-        int rows = orderInfoMapper.updateById(orderInfo);
-        if(rows != 1) {
-            //抢单失败
+                //修改order_info表订单状态值2：已经接单 + 司机id + 司机接单时间
+                //修改条件：根据订单id
+                LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(OrderInfo::getId,orderId);
+                wrapper.eq(OrderInfo::getStatus,OrderStatus.WAITING_ACCEPT.getStatus());
+
+                OrderInfo orderInfo = new OrderInfo();
+                orderInfo.setStatus(OrderStatus.ACCEPTED.getStatus());
+                orderInfo.setDriverId(driverId);
+                orderInfo.setAcceptTime(new Date());
+                //调用方法修改
+                int rows = orderInfoMapper.updateById(orderInfo);
+                if(rows != 1) {
+                    //抢单失败
+                    throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
+                }
+
+                //删除抢单标识
+                redisTemplate.delete(RedisConstant.ORDER_ACCEPT_MARK);
+            }
+
+        }catch (Exception e) {
+            log.error("robNewOrder error:{}", e);
             throw new GuiguException(ResultCodeEnum.COB_NEW_ORDER_FAIL);
+        }finally {
+            //如果锁还在（没有过期）
+            if(lock.isLocked()) {
+                //释放锁
+                lock.unlock();
+            }
         }
 
-        //删除抢单标识
-        redisTemplate.delete(RedisConstant.ORDER_ACCEPT_MARK);
+
         return true;
+    }
+
+    //乘客端查找当前订单
+    @Override
+    public CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId) {
+        //封装条件
+        //乘客id
+        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OrderInfo::getCustomerId,customerId);
+
+        //各种状态
+        Integer[] statusArray = {
+                OrderStatus.ACCEPTED.getStatus(),
+                OrderStatus.DRIVER_ARRIVED.getStatus(),
+                OrderStatus.UPDATE_CART_INFO.getStatus(),
+                OrderStatus.START_SERVICE.getStatus(),
+                OrderStatus.END_SERVICE.getStatus(),
+                OrderStatus.UNPAID.getStatus()
+        };
+        wrapper.in(OrderInfo::getStatus,statusArray);
+
+        //获取最新一条记录
+        wrapper.orderByDesc(OrderInfo::getId);
+        wrapper.last(" limit 1");
+
+        //调用方法
+        OrderInfo orderInfo = orderInfoMapper.selectOne(wrapper);
+
+        //封装到CurrentOrderInfoVo
+        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
+        if(orderInfo != null) {
+            currentOrderInfoVo.setOrderId(orderInfo.getId());
+            currentOrderInfoVo.setStatus(orderInfo.getStatus());
+            currentOrderInfoVo.setIsHasCurrentOrder(true);
+        } else {
+            currentOrderInfoVo.setIsHasCurrentOrder(false);
+        }
+        return currentOrderInfoVo;
+    }
+
+    //司机端查找当前订单
+    @Override
+    public CurrentOrderInfoVo searchDriverCurrentOrder(Long driverId) {
+        //封装条件
+        LambdaQueryWrapper<OrderInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(OrderInfo::getDriverId,driverId);
+        Integer[] statusArray = {
+                OrderStatus.ACCEPTED.getStatus(),
+                OrderStatus.DRIVER_ARRIVED.getStatus(),
+                OrderStatus.UPDATE_CART_INFO.getStatus(),
+                OrderStatus.START_SERVICE.getStatus(),
+                OrderStatus.END_SERVICE.getStatus()
+        };
+        wrapper.in(OrderInfo::getStatus,statusArray);
+        wrapper.orderByDesc(OrderInfo::getId);
+        wrapper.last(" limit 1");
+        OrderInfo orderInfo = orderInfoMapper.selectOne(wrapper);
+        //封装到vo
+        CurrentOrderInfoVo currentOrderInfoVo = new CurrentOrderInfoVo();
+        if(null != orderInfo) {
+            currentOrderInfoVo.setStatus(orderInfo.getStatus());
+            currentOrderInfoVo.setOrderId(orderInfo.getId());
+            currentOrderInfoVo.setIsHasCurrentOrder(true);
+        } else {
+            currentOrderInfoVo.setIsHasCurrentOrder(false);
+        }
+        return currentOrderInfoVo;
     }
 
     public void log(Long orderId, Integer status) {
