@@ -5,12 +5,15 @@ import com.atguigu.daijia.common.result.ResultCodeEnum;
 import com.atguigu.daijia.dispatch.client.NewOrderFeignClient;
 import com.atguigu.daijia.driver.client.DriverInfoFeignClient;
 import com.atguigu.daijia.driver.service.OrderService;
+import com.atguigu.daijia.map.client.LocationFeignClient;
 import com.atguigu.daijia.map.client.MapFeignClient;
 import com.atguigu.daijia.model.entity.order.OrderInfo;
 import com.atguigu.daijia.model.form.map.CalculateDrivingLineForm;
+import com.atguigu.daijia.model.form.order.StartDriveForm;
 import com.atguigu.daijia.model.form.order.UpdateOrderCartForm;
 import com.atguigu.daijia.model.vo.driver.DriverInfoVo;
 import com.atguigu.daijia.model.vo.map.DrivingLineVo;
+import com.atguigu.daijia.model.vo.map.OrderServiceLastLocationVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import com.atguigu.daijia.model.vo.order.NewOrderDataVo;
 import com.atguigu.daijia.model.vo.order.OrderInfoVo;
@@ -32,7 +35,7 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private NewOrderFeignClient newOrderFeignClient;
     @Autowired
-    private DriverInfoFeignClient driverInfoFeignClient;
+    private LocationFeignClient locationFeignClient;
     @Autowired
     private MapFeignClient mapFeignClient;
 
@@ -91,6 +94,18 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm) {
         return mapFeignClient.calculateDrivingLine(calculateDrivingLineForm).getData();
+    }
+
+    //开始服务
+    @Override
+    public Boolean startDrive(StartDriveForm startDriveForm) {
+        return orderInfoFeignClient.startDrive(startDriveForm).getData();
+    }
+
+    //代驾服务：获取订单服务最后一个位置信息
+    @Override
+    public OrderServiceLastLocationVo getOrderServiceLastLocation(Long orderId) {
+        return locationFeignClient.getOrderServiceLastLocation(orderId).getData();
     }
 
 }

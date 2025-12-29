@@ -4,6 +4,7 @@ import com.atguigu.daijia.common.login.GuiguLogin;
 import com.atguigu.daijia.common.result.Result;
 import com.atguigu.daijia.common.util.AuthContextHolder;
 import com.atguigu.daijia.driver.service.LocationService;
+import com.atguigu.daijia.model.form.map.OrderServiceLocationForm;
 import com.atguigu.daijia.model.form.map.UpdateDriverLocationForm;
 import com.atguigu.daijia.model.form.map.UpdateOrderLocationForm;
 import com.atguigu.daijia.model.vo.map.OrderLocationVo;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Tag(name = "位置API接口管理")
@@ -38,10 +41,10 @@ public class LocationController {
         return Result.ok(locationService.updateOrderLocationToCache(updateOrderLocationForm));
     }
 
-    @Operation(summary = "司机赶往代驾起始点：获取订单经纬度位置")
-    @GetMapping("/getCacheOrderLocation/{orderId}")
-    public Result<OrderLocationVo> getCacheOrderLocation(@PathVariable Long orderId) {
-        return Result.ok(locationService.getCacheOrderLocation(orderId));
+    @Operation(summary = "开始代驾服务：保存代驾服务订单位置")
+    @PostMapping("/saveOrderServiceLocation")
+    public Result<Boolean> saveOrderServiceLocation(@RequestBody List<OrderServiceLocationForm> orderLocationServiceFormList) {
+        return Result.ok(locationService.saveOrderServiceLocation(orderLocationServiceFormList));
     }
 }
 

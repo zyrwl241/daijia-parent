@@ -2,6 +2,7 @@ package com.atguigu.daijia.driver.controller;
 
 import com.atguigu.daijia.common.result.Result;
 import com.atguigu.daijia.driver.service.CosService;
+import com.atguigu.daijia.driver.service.FileService;
 import com.atguigu.daijia.model.vo.driver.CosUploadVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,6 +17,8 @@ public class FileController {
 
     @Autowired
     private CosService cosService;
+    @Autowired
+    private FileService fileService;
 
     //文件上传接口
     @Operation(summary = "上传")
@@ -26,6 +29,12 @@ public class FileController {
         CosUploadVo cosUploadVo = cosService.upload(file,path);
         String showURL = cosUploadVo.getShowUrl();
         return Result.ok(showURL);
+    }
+
+    @Operation(summary = "Minio文件上传")
+    @PostMapping("upload")
+    public Result<String> upload(@RequestPart("file") MultipartFile file) {
+        return Result.ok(fileService.upload(file));
     }
 
 }
