@@ -72,13 +72,6 @@ public class OrderController {
         return Result.ok(orderService.getOrderInfo(orderId, driverId));
     }
 
-    @Operation(summary = "根据订单id获取司机基本信息")
-    @GuiguLogin
-    @GetMapping("/getDriverInfo/{orderId}")
-    public Result<DriverInfoVo> getDriverInfo(@PathVariable Long orderId) {
-        Long customerId = AuthContextHolder.getUserId();
-        return Result.ok(orderService.getDriverInfoOrder(orderId, customerId));
-    }
 
     @Operation(summary = "司机到达代驾起始地点")
     @GuiguLogin
@@ -95,6 +88,13 @@ public class OrderController {
         Long driverId = AuthContextHolder.getUserId();
         updateOrderCartForm.setDriverId(driverId);
         return Result.ok(orderService.updateOrderCart(updateOrderCartForm));
+    }
+
+    @Operation(summary = "计算最佳驾驶线路")
+    @GuiguLogin
+    @PostMapping("/calculateDrivingLine")
+    public Result<DrivingLineVo> calculateDrivingLine(@RequestBody CalculateDrivingLineForm calculateDrivingLineForm) {
+        return Result.ok(orderService.calculateDrivingLine(calculateDrivingLineForm));
     }
 }
 

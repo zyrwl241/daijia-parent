@@ -251,14 +251,16 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
 
         //封装订单信息的代驾车辆部分
         OrderInfo orderInfo = new OrderInfo();
+        System.out.println("==============================: \n\n" + updateOrderCartForm);
         BeanUtils.copyProperties(updateOrderCartForm,orderInfo);
         orderInfo.setStatus(OrderStatus.UPDATE_CART_INFO.getStatus());
 
         int rows = orderInfoMapper.update(orderInfo, wrapper);
-        if(rows == 1) {//等于1，表示更新成功
-
+        if(rows == 1) {//等于1，表示更新成
+            System.out.println("更新代驾车辆信息：success" );
             return true;
         } else {
+            System.err.println("更新代驾车辆信息：error" );
             throw new GuiguException(ResultCodeEnum.UPDATE_ERROR);
         }
     }

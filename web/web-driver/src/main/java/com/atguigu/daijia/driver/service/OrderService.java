@@ -22,9 +22,10 @@ public interface OrderService {
 
     OrderInfoVo getOrderInfo(Long orderId, Long driverId);
 
-    DriverInfoVo getDriverInfoOrder(Long orderId, Long customerId);
 
     Boolean driverArriverStartLocation(Long orderId, Long driverId);
 
     Boolean updateOrderCart(UpdateOrderCartForm updateOrderCartForm);
+
+    DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm);
 }

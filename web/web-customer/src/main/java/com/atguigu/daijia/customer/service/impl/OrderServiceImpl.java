@@ -5,6 +5,7 @@ import com.atguigu.daijia.common.result.Result;
 import com.atguigu.daijia.common.result.ResultCodeEnum;
 import com.atguigu.daijia.customer.service.OrderService;
 import com.atguigu.daijia.dispatch.client.NewOrderFeignClient;
+import com.atguigu.daijia.driver.client.DriverInfoFeignClient;
 import com.atguigu.daijia.map.client.MapFeignClient;
 import com.atguigu.daijia.model.entity.order.OrderInfo;
 import com.atguigu.daijia.model.form.customer.ExpectOrderForm;
@@ -14,6 +15,7 @@ import com.atguigu.daijia.model.form.order.OrderInfoForm;
 import com.atguigu.daijia.model.form.rules.FeeRuleRequestForm;
 import com.atguigu.daijia.model.vo.customer.ExpectOrderVo;
 import com.atguigu.daijia.model.vo.dispatch.NewOrderTaskVo;
+import com.atguigu.daijia.model.vo.driver.DriverInfoVo;
 import com.atguigu.daijia.model.vo.map.DrivingLineVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import com.atguigu.daijia.model.vo.order.OrderInfoVo;
@@ -40,6 +42,8 @@ public class OrderServiceImpl implements OrderService {
     private OrderInfoFeignClient orderInfoFeignClient;
     @Autowired
     private NewOrderFeignClient newOrderFeignClient;
+    @Autowired
+    private DriverInfoFeignClient driverInfoFeignClient;
 
 
     //预估订单数据
@@ -140,16 +144,27 @@ public class OrderServiceImpl implements OrderService {
         return orderInfoVo;
     }
 
-    //计算最佳驾驶路线
-    @Override
-    public DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm) {
-        return mapFeignClient.calculateDrivingLine(calculateDrivingLineForm).getData();
-    }
-
     //获取订单状态
     @Override
     public Integer getOrderStatus(Long orderId) {
         Result<Integer> integerResult = orderInfoFeignClient.getOrderStatus(orderId);
         return integerResult.getData();
+    }
+
+    //根据订单id获取司机信息
+    @Override
+    public DriverInfoVo getDriverInfoOrder(Long orderId, Long customerId) {
+        //根据订单id获取订单信息
+        OrderInfo orderInfo = orderInfoFeignClient.getOrderInfo(orderId).getData();
+        if(!orderInfo.getCustomerId().equals(customerId)) {
+            throw new GuiguException(ResultCodeEnum.DATA_ERROR);
+        }
+        return driverInfoFeignClient.getDriverInfoOrder(orderInfo.getDriverId()).getData();
+    }
+
+    //计算最佳驾驶路线
+    @Override
+    public DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm) {
+        return mapFeignClient.calculateDrivingLine(calculateDrivingLineForm).getData();
     }
 }

@@ -4,6 +4,7 @@ import com.atguigu.daijia.model.form.customer.ExpectOrderForm;
 import com.atguigu.daijia.model.form.customer.SubmitOrderForm;
 import com.atguigu.daijia.model.form.map.CalculateDrivingLineForm;
 import com.atguigu.daijia.model.vo.customer.ExpectOrderVo;
+import com.atguigu.daijia.model.vo.driver.DriverInfoVo;
 import com.atguigu.daijia.model.vo.map.DrivingLineVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import com.atguigu.daijia.model.vo.order.OrderInfoVo;
@@ -19,6 +20,8 @@ public interface OrderService {
     CurrentOrderInfoVo searchCustomerCurrentOrder(Long customerId);
 
     OrderInfoVo getOrderInfo(Long orderId, Long customerId);
+
+    DriverInfoVo getDriverInfoOrder(Long orderId, Long customerId);
 
     DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm);
 }

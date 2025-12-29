@@ -33,6 +33,8 @@ public class OrderServiceImpl implements OrderService {
     private NewOrderFeignClient newOrderFeignClient;
     @Autowired
     private DriverInfoFeignClient driverInfoFeignClient;
+    @Autowired
+    private MapFeignClient mapFeignClient;
 
     //根据订单id获取订单状态
     @Override
@@ -71,17 +73,6 @@ public class OrderServiceImpl implements OrderService {
         return orderInfoVo;
     }
 
-    //根据订单id获取司机信息
-    @Override
-    public DriverInfoVo getDriverInfoOrder(Long orderId, Long customerId) {
-        //根据订单id获取订单信息
-        OrderInfo orderInfo = orderInfoFeignClient.getOrderInfo(orderId).getData();
-        if(!orderInfo.getCustomerId().equals(customerId)) {
-            throw new GuiguException(ResultCodeEnum.DATA_ERROR);
-        }
-        return driverInfoFeignClient.getDriverInfoOrder(orderInfo.getDriverId()).getData();
-    }
-
     //司机到达代驾起始地点
     @Override
     public Boolean driverArriverStartLocation(Long orderId, Long driverId) {
@@ -91,7 +82,15 @@ public class OrderServiceImpl implements OrderService {
     //更新代驾车辆信息
     @Override
     public Boolean updateOrderCart(UpdateOrderCartForm updateOrderCartForm) {
-        return orderInfoFeignClient.updateOrderCart(updateOrderCartForm).getData();
+        Boolean flag = orderInfoFeignClient.updateOrderCart(updateOrderCartForm).getData();
+        System.out.println("更新车辆信息" + flag);
+        return flag;
+    }
+
+    //计算最佳驾驶路线
+    @Override
+    public DrivingLineVo calculateDrivingLine(CalculateDrivingLineForm calculateDrivingLineForm) {
+        return mapFeignClient.calculateDrivingLine(calculateDrivingLineForm).getData();
     }
 
 }
