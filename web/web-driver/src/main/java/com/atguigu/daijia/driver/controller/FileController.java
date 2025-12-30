@@ -20,7 +20,7 @@ public class FileController {
     @Autowired
     private FileService fileService;
 
-    //文件上传接口
+/*    //文件上传接口COS
     @Operation(summary = "上传")
     //@GuiguLogin
     @PostMapping("/upload")
@@ -29,7 +29,7 @@ public class FileController {
         CosUploadVo cosUploadVo = cosService.upload(file,path);
         String showURL = cosUploadVo.getShowUrl();
         return Result.ok(showURL);
-    }
+    }*/
 
     @Operation(summary = "Minio文件上传")
     @PostMapping("upload")
