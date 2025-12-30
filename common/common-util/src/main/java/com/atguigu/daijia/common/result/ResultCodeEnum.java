@@ -46,7 +46,8 @@ public enum ResultCodeEnum {
     COUPON_EXPIRE( 250, "优惠券已过期"),
     COUPON_LESS( 250, "优惠券库存不足"),
     COUPON_USER_LIMIT( 250, "超出领取数量"),
-    ;
+    DATA_NOT_EXIST(360, "结束代驾失败：订单信息不存在"),
+    SYSTEM_ERROR(360, "获取订单信息失败");
 
     private Integer code;
 
