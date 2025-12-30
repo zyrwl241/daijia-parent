@@ -35,5 +35,6 @@ public class OrderMonitorController {
     public Result<Boolean> updateOrderMonitor(@RequestBody OrderMonitor OrderMonitor) {
         return Result.ok(orderMonitorService.updateOrderMonitor(OrderMonitor));
     }
+
 }
 

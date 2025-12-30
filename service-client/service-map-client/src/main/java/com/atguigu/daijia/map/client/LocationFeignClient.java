@@ -10,6 +10,7 @@ import com.atguigu.daijia.model.vo.map.OrderServiceLastLocationVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @FeignClient(value = "service-map")
@@ -37,4 +38,8 @@ public interface LocationFeignClient {
     //代驾服务：获取订单服务最后一个位置信息
     @GetMapping("/map/location/getOrderServiceLastLocation/{orderId}")
     Result<OrderServiceLastLocationVo> getOrderServiceLastLocation(@PathVariable Long orderId);
+
+    //代驾服务：计算订单实际里程
+    @GetMapping("/map/location/calculateOrderRealDistance/{orderId}")
+    Result<BigDecimal> calculateOrderRealDistance(@PathVariable Long orderId);
 }
