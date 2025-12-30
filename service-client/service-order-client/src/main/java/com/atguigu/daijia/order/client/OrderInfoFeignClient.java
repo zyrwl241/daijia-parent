@@ -6,6 +6,7 @@ import com.atguigu.daijia.model.form.order.OrderInfoForm;
 import com.atguigu.daijia.model.form.order.StartDriveForm;
 import com.atguigu.daijia.model.form.order.UpdateOrderBillForm;
 import com.atguigu.daijia.model.form.order.UpdateOrderCartForm;
+import com.atguigu.daijia.model.vo.base.PageVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,4 +61,16 @@ public interface OrderInfoFeignClient {
     //结束代驾服务更新订单账单
     @PostMapping("/order/info/endDrive")
     Result<Boolean> endDrive(@RequestBody UpdateOrderBillForm updateOrderBillForm);
+
+    //获取乘客订单分页列表
+    @GetMapping("/order/info/findCustomerOrderPage/{customerId}/{page}/{limit}")
+    Result<PageVo> findCustomerOrderPage(@PathVariable("customerId") Long customerId,
+                                         @PathVariable("page") Long page,
+                                         @PathVariable("limit") Long limit);
+
+    //获取司机订单分页列表
+    @GetMapping("/order/info/findDriverOrderPage/{driverId}/{page}/{limit}")
+    Result<PageVo> findDriverOrderPage(@PathVariable("driverId") Long driverId,
+                                       @PathVariable("page") Long page,
+                                       @PathVariable("limit") Long limit);
 }

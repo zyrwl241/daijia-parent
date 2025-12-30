@@ -9,11 +9,15 @@ import com.atguigu.daijia.model.form.order.OrderInfoForm;
 import com.atguigu.daijia.model.form.order.StartDriveForm;
 import com.atguigu.daijia.model.form.order.UpdateOrderBillForm;
 import com.atguigu.daijia.model.form.order.UpdateOrderCartForm;
+import com.atguigu.daijia.model.vo.base.PageVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
+import com.atguigu.daijia.model.vo.order.OrderListVo;
 import com.atguigu.daijia.order.mapper.*;
 import com.atguigu.daijia.order.service.OrderInfoService;
 import com.atguigu.daijia.order.service.OrderMonitorService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -348,6 +352,18 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
             throw new GuiguException(ResultCodeEnum.UPDATE_ERROR);
         }
         return true;
+    }
+
+    @Override
+    public PageVo findCustomerOrderPage(Page<OrderInfo> pageParam, Long customerId) {
+        IPage<OrderListVo> pageInfo = orderInfoMapper.selectCustomerOrderPage(pageParam, customerId);
+        return new PageVo(pageInfo.getRecords(), pageInfo.getPages(), pageInfo.getTotal());
+    }
+
+    @Override
+    public PageVo findDriverOrderPage(Page<OrderInfo> pageParam, Long driverId) {
+        IPage<OrderListVo> pageInfo = orderInfoMapper.selectDriverOrderPage(pageParam, driverId);
+        return new PageVo(pageInfo.getRecords(), pageInfo.getPages(), pageInfo.getTotal());
     }
 
     public void log(Long orderId, Integer status) {
