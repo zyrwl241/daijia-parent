@@ -17,6 +17,7 @@ import com.atguigu.daijia.model.vo.map.OrderServiceLastLocationVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
 import com.atguigu.daijia.model.vo.order.NewOrderDataVo;
 import com.atguigu.daijia.model.vo.order.OrderInfoVo;
+import com.atguigu.daijia.model.vo.order.OrderProfitsharingVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -35,8 +36,6 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
-    @Autowired
-    private DriverService driverService;
 
     @Operation(summary = "查询订单状态")
     @GuiguLogin
@@ -140,5 +139,7 @@ public class OrderController {
         PageVo pageVo = orderService.findDriverOrderPage(driverId, page, limit);
         return Result.ok(pageVo);
     }
+
+
 }
 

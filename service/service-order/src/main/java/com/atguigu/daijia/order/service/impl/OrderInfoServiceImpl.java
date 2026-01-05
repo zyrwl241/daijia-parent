@@ -11,7 +11,9 @@ import com.atguigu.daijia.model.form.order.UpdateOrderBillForm;
 import com.atguigu.daijia.model.form.order.UpdateOrderCartForm;
 import com.atguigu.daijia.model.vo.base.PageVo;
 import com.atguigu.daijia.model.vo.order.CurrentOrderInfoVo;
+import com.atguigu.daijia.model.vo.order.OrderBillVo;
 import com.atguigu.daijia.model.vo.order.OrderListVo;
+import com.atguigu.daijia.model.vo.order.OrderProfitsharingVo;
 import com.atguigu.daijia.order.mapper.*;
 import com.atguigu.daijia.order.service.OrderInfoService;
 import com.atguigu.daijia.order.service.OrderMonitorService;
@@ -354,16 +356,35 @@ public class OrderInfoServiceImpl extends ServiceImpl<OrderInfoMapper, OrderInfo
         return true;
     }
 
+    //获取乘客订单分页列表
     @Override
     public PageVo findCustomerOrderPage(Page<OrderInfo> pageParam, Long customerId) {
         IPage<OrderListVo> pageInfo = orderInfoMapper.selectCustomerOrderPage(pageParam, customerId);
         return new PageVo(pageInfo.getRecords(), pageInfo.getPages(), pageInfo.getTotal());
     }
 
+    //获取司机订单分页列表
     @Override
     public PageVo findDriverOrderPage(Page<OrderInfo> pageParam, Long driverId) {
         IPage<OrderListVo> pageInfo = orderInfoMapper.selectDriverOrderPage(pageParam, driverId);
         return new PageVo(pageInfo.getRecords(), pageInfo.getPages(), pageInfo.getTotal());
+    }
+
+    //获取订单信息
+    @Override
+    public OrderBillVo getOrderBillInfo(Long orderId) {
+        OrderBill orderBill = orderBillMapper.selectOne(new LambdaQueryWrapper<OrderBill>().eq(OrderBill::getOrderId, orderId));
+        OrderBillVo orderBillVo = new OrderBillVo();
+        BeanUtils.copyProperties(orderBill, orderBillVo);
+        return orderBillVo;
+    }
+
+    @Override
+    public OrderProfitsharingVo getOrderProfitsharing(Long orderId) {
+        OrderProfitsharing orderProfitsharing = orderProfitsharingMapper.selectOne(new LambdaQueryWrapper<OrderProfitsharing>().eq(OrderProfitsharing::getOrderId, orderId));
+        OrderProfitsharingVo orderProfitsharingVo = new OrderProfitsharingVo();
+        BeanUtils.copyProperties(orderProfitsharing, orderProfitsharingVo);
+        return orderProfitsharingVo;
     }
 
     public void log(Long orderId, Integer status) {
