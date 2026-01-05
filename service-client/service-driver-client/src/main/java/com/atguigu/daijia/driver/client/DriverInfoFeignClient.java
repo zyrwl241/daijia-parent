@@ -19,7 +19,7 @@ public interface DriverInfoFeignClient {
     //小程序登录
     @GetMapping("/driver/info/login/{code}")
     Result<Long> login(@PathVariable("code") String code);
-    //获取司机信息
+    //获取司机登录信息
     @GetMapping("/driver/info/getDriverLoginInfo/{driverId}")
     Result<DriverLoginVo> getDriverInfo(@PathVariable("driverId") Long driverId);
     //获取司机认证信息
