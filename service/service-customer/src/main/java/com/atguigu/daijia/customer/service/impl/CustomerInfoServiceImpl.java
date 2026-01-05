@@ -101,4 +101,11 @@ public class CustomerInfoServiceImpl extends ServiceImpl<CustomerInfoMapper, Cus
         //3.CustomerLoginVo返回
         return customerLoginVo;
     }
+
+    //获取客户OpenId
+    @Override
+    public String getCustomerOpenId(Long customerId) {
+        CustomerInfo customerInfo = this.getOne(new LambdaQueryWrapper<CustomerInfo>().eq(CustomerInfo::getId, customerId).select(CustomerInfo::getWxOpenId));
+        return customerInfo.getWxOpenId();
+    }
 }

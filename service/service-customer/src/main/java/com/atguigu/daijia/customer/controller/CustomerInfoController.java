@@ -34,5 +34,11 @@ public class CustomerInfoController {
 	public Result<Long> login(@PathVariable String code) throws WxErrorException {
 		return Result.ok(customerInfoService.login(code));
 	}
+
+	@Operation(summary = "获取客户OpenId")
+	@GetMapping("/getCustomerOpenId/{customerId}")
+	public Result<String> getCustomerOpenId(@PathVariable Long customerId) {
+		return Result.ok(customerInfoService.getCustomerOpenId(customerId));
+	}
 }
 
