@@ -57,4 +57,5 @@ public class WxPayController {
         result.put("message", "失败");
         return result;
     }
+
 }

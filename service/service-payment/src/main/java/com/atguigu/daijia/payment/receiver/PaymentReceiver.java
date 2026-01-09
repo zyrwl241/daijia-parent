@@ -23,6 +23,7 @@ public class PaymentReceiver {
             key = {MqConst.ROUTING_PAY_SUCCESS}
     ))
     public void paySuccess(String orderNo, Message message, Channel channel) {
+
         wxPayService.handleOrder(orderNo);
     }
 }
