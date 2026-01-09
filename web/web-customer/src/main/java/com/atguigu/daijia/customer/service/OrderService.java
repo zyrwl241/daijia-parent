@@ -35,4 +35,6 @@ public interface OrderService {
 
     //创建微信支付
     WxPrepayVo createWxPayment(CreateWxPaymentForm createWxPaymentForm);
+
+    Boolean queryPayStatus(String orderNo);
 }
